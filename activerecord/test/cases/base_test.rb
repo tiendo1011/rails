@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "pry-byebug"
 require "cases/helper"
 require "models/post"
 require "models/author"
@@ -68,11 +69,13 @@ class BasicsTest < ActiveRecord::TestCase
   fixtures :topics, :companies, :developers, :projects, :computers, :accounts, :minimalistics, "warehouse-things", :authors, :author_addresses, :categorizations, :categories, :posts
 
   def test_generated_association_methods_module_name
+    # const_set, private_constant, include
     mod = Post.send(:generated_association_methods)
     assert_equal "Post::GeneratedAssociationMethods", mod.inspect
   end
 
   def test_generated_relation_methods_module_name
+    # Class.new.tab do |mod|
     mod = Post.send(:generated_relation_methods)
     assert_equal "Post::GeneratedRelationMethods", mod.inspect
   end

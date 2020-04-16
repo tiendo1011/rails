@@ -13,9 +13,9 @@ Rake::TestTask.new do |t|
   t.ruby_opts = ["--dev"] if defined?(JRUBY_VERSION)
 end
 
-Rake::Task[:test].enhance do
-  Rake::Task["test:cache_stores:redis:ruby"].invoke
-end
+# Rake::Task[:test].enhance do
+#   Rake::Task["test:cache_stores:redis:ruby"].invoke
+# end
 
 namespace :test do
   task :isolated do

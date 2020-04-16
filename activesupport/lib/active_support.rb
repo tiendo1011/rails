@@ -23,12 +23,28 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #++
 
+require "pry-byebug"
+require "colorize"
 require "securerandom"
 require "active_support/dependencies/autoload"
 require "active_support/version"
 require "active_support/logger"
 require "active_support/lazy_load_hooks"
 require "active_support/core_ext/date_and_time/compatibility"
+
+module PWithLineNumber
+  def p(*args)
+    file_path, line_number = caller.first.split(":")
+    file_path_array = file_path.split('/') || []
+    start_point = file_path_array.length >= 4 ? -4 : -file_path_array.length
+    print "##{file_path_array[start_point..-1].join('/')}:#{line_number} ".blue
+    super(*args)
+  end
+end
+
+Object.class_eval do
+  prepend PWithLineNumber
+end
 
 module ActiveSupport
   extend ActiveSupport::Autoload

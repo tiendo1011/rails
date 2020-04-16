@@ -22,11 +22,7 @@ class Array
   #   %w( a b c d ).to(-2) # => ["a", "b", "c"]
   #   %w( a b c ).to(-10)  # => []
   def to(position)
-    if position >= 0
-      take position + 1
-    else
-      self[0..position]
-    end
+    self[0..position]
   end
 
   # Returns a new array that includes the passed elements.

@@ -3,6 +3,12 @@
 require_relative "../../abstract_unit"
 require "active_support/core_ext/array"
 
+# A. common cases:
+# array: [1, 2]
+# empty array: []
+# no block given
+# B. edge cases:
+# array with mixing element type: [nil, true] <= This is not necessary since the array & the block is given by the user
 class ExtractTest < ActiveSupport::TestCase
   def test_extract
     numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]

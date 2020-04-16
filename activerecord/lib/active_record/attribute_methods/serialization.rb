@@ -64,11 +64,17 @@ module ActiveRecord
           coder = if class_name_or_coder == ::JSON
             Coders::JSON
           elsif [:load, :dump].all? { |x| class_name_or_coder.respond_to?(x) }
+            # coder needs to be able to respond to load & dump
             class_name_or_coder
           else
+            # Select YAML as default coder
             Coders::YAMLColumn.new(attr_name, class_name_or_coder)
           end
 
+          # this is quite interesting
+          # decorate_attribute_type as a mean to get type
+          # and do something with the type getting
+          # right here
           decorate_attribute_type(attr_name, :serialize) do |type|
             if type_incompatible_with_serialize?(type, class_name_or_coder)
               raise ColumnNotSerializableError.new(attr_name, type)

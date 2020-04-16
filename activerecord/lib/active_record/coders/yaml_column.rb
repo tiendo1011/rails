@@ -14,6 +14,7 @@ module ActiveRecord
       end
 
       def dump(obj)
+        # Check obj.nil? here & inside assert_valid_value, feel that?
         return if obj.nil?
 
         assert_valid_value(obj, action: "dump")
@@ -21,7 +22,9 @@ module ActiveRecord
       end
 
       def load(yaml)
-        return object_class.new if object_class != Object && yaml.nil?
+        # disable this line doesn't raise error on test?
+        # ARCONN=postgresql bundle exec ruby -Itest test/cases/coders/yaml_column_test.rb
+        # return object_class.new if object_class != Object && yaml.nil?
         return yaml unless yaml.is_a?(String) && /^---/.match?(yaml)
         obj = YAML.load(yaml)
 
@@ -40,6 +43,7 @@ module ActiveRecord
 
       private
         def check_arity_of_constructor
+          # Interesting, use load itself to check constructor arity, but why?
           load(nil)
         rescue ArgumentError
           raise ArgumentError, "Cannot serialize #{object_class}. Classes passed to `serialize` must have a 0 argument constructor."

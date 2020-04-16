@@ -6,6 +6,14 @@ require "active_support/core_ext/big_decimal"
 require "active_support/core_ext/hash"
 require "active_support/core_ext/string"
 
+# Positive: works as expected (Angel hat)
+# case 1: word w/ different length: 0, 1, 2, 3
+# case 2: word w/ different length, custom connector (one by one)
+# case 3: Set I18n
+# Negative: handle tough ride (edgy input) (Evil hat)
+# case 1: invalid input (nil, number)
+# case 2: wrong option
+
 class ToSentenceTest < ActiveSupport::TestCase
   def test_plain_array_to_sentence
     assert_equal "", [].to_sentence
@@ -32,29 +40,35 @@ class ToSentenceTest < ActiveSupport::TestCase
     assert_equal "one two", ["one", "two"].to_sentence(two_words_connector: " ")
   end
 
+  # Seems like this one is redundant
   def test_one_element
     assert_equal "one", ["one"].to_sentence
   end
 
+  # why?
   def test_one_element_not_same_object
     elements = ["one"]
     assert_not_equal elements[0].object_id, elements.to_sentence.object_id
   end
 
+  # this one is a good one that I missed: Different input than expected
   def test_one_non_string_element
     assert_equal "1", [1].to_sentence
   end
 
+  # Not sure why we need this
   def test_does_not_modify_given_hash
     options = { words_connector: " " }
     assert_equal "one two, and three", ["one", "two", "three"].to_sentence(options)
     assert_equal({ words_connector: " " }, options)
   end
 
+  # this one is also good: nil input
   def test_with_blank_elements
     assert_equal ", one, , two, and three", [nil, "one", "", "two", "three"].to_sentence
   end
 
+  # this one is good: invalid options
   def test_with_invalid_options
     exception = assert_raise ArgumentError do
       ["one", "two"].to_sentence(passing: "invalid option")
@@ -93,6 +107,20 @@ class ToSTest < ActiveSupport::TestCase
   end
 end
 
+# What to test
+# 1. Common cases:
+# db class: [{id, project_type}] <= we need to add this to test? this is same as non-hash element?
+# object class: [{}]
+# object class: [{}] with root
+# empty array: []
+# with skip_types option
+# 2. edge cases:
+# [1, 2] ?
+# [1, 2, true] ? <= this is even more nasty, mixing input
+# [nil] ? <= and this one?
+# invalid option <= and this one?
+# 3. business
+#
 class ToXmlTest < ActiveSupport::TestCase
   def test_to_xml_with_hash_elements
     xml = [
@@ -187,6 +215,7 @@ class ToXmlTest < ActiveSupport::TestCase
     assert_equal 0, xml.rindex(/<\?xml /)
   end
 
+  # This is nice to test, too
   def test_to_xml_with_block
     xml = [
       { name: "David", age: 26, age_in_millis: 820497600000 },
