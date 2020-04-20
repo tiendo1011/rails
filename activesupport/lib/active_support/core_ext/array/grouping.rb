@@ -1,3 +1,4 @@
+# GOLD
 # frozen_string_literal: true
 
 class Array
@@ -20,6 +21,7 @@ class Array
   #   ["3", "4"]
   #   ["5"]
   def in_groups_of(number, fill_with = nil)
+    # It's common that we check for valid input before processing
     if number.to_i <= 0
       raise ArgumentError,
         "Group size must be a positive integer, was #{number.inspect}"
@@ -30,7 +32,7 @@ class Array
     else
       # size % number gives how many extra we have;
       # subtracting from number gives how many to add;
-      # modulo number ensures we don't add group of just fill.
+      # modulo number ensures we don't add group of just fill. <= this part is what I'll miss if I implement this, why? (boundary issue)
       padding = (number - size % number) % number
       collection = dup.concat(Array.new(padding, fill_with))
     end
@@ -62,7 +64,11 @@ class Array
   def in_groups(number, fill_with = nil)
     # size.div number gives minor group size;
     # size % number gives how many objects need extra accommodation;
-    # each group hold either division or division + 1 items.
+    # each group hold either division or division + 1 items. <= this takes me a bit long to understand, why?
+    # seems like employing visual technique will help
+    # 3.div 2, 3 % 2
+    # *
+    # * *
     division = size.div number
     modulo = size % number
 
@@ -71,8 +77,12 @@ class Array
     start = 0
 
     number.times do |index|
-      length = division + (modulo > 0 && modulo > index ? 1 : 0)
+      length = division + (modulo > 0 && modulo > index ? 1 : 0) # <= The visual technique also help with this
       groups << last_group = slice(start, length)
+      # This processing bit right here is particularly clever
+      # Get the length first of the group first, then using reference
+      # to insert the fill_with into group
+      # that way we eliminate what change (group) from what stay the same (length)
       last_group << fill_with if fill_with != false &&
         modulo > 0 && length == division
       start += length
@@ -91,10 +101,13 @@ class Array
   #   [1, 2, 3, 4, 5].split(3)              # => [[1, 2], [4, 5]]
   #   (1..10).to_a.split { |i| i % 3 == 0 } # => [[1, 2], [4, 5], [7, 8], [10]]
   def split(value = nil)
+    # Good practice, avoid mutating the original argument
     arr = dup
     result = []
     if block_given?
       while (idx = arr.index { |i| yield i })
+        # This one is pretty clever
+        # find idx, then shift it, so it shift exactly before the element
         result << arr.shift(idx)
         arr.shift
       end
@@ -104,6 +117,9 @@ class Array
         arr.shift
       end
     end
+    # push the remainder to result
+    # a got a hiccup here
+    # Better spend more time to understand the way this method is handled
     result << arr
   end
 end
